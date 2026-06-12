@@ -913,6 +913,8 @@
         .reveal-stagger.visible>*:nth-child(4) { transition-delay: .24s; opacity: 1; transform: translateY(0); }
         .reveal-stagger.visible>*:nth-child(5) { transition-delay: .32s; opacity: 1; transform: translateY(0); }
         .reveal-stagger.visible>*:nth-child(6) { transition-delay: .40s; opacity: 1; transform: translateY(0); }
+        .reveal-stagger.visible>*:nth-child(7) { transition-delay: .48s; opacity: 1; transform: translateY(0); }
+        .reveal-stagger.visible>*:nth-child(8) { transition-delay: .56s; opacity: 1; transform: translateY(0); }
 
         @media(max-width: 1000px) {
             .stack-categories { grid-template-columns: 1fr; max-width: 420px; }
@@ -924,6 +926,89 @@
             .cta-section { padding: 80px 28px; }
             .header-inner { padding: 0 24px; }
         }
+        /* ===== 资源链接 ===== */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+        .resource-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #fff;
+            border: 1px solid var(--gray150);
+            border-radius: var(--radius);
+            padding: 22px 24px;
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+            box-shadow: var(--shadow-xs);
+            position: relative;
+            overflow: hidden;
+        }
+        .resource-card:hover {
+            border-color: rgba(96, 155, 153, .25);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-3px);
+        }
+        .resource-card__icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 11px;
+            background: rgba(96, 155, 153, .08);
+            color: var(--accent);
+            flex-shrink: 0;
+            transition: var(--transition-bounce);
+        }
+        .resource-card:hover .resource-card__icon {
+            transform: scale(1.08);
+            background: rgba(96, 155, 153, .15);
+        }
+        .resource-card__icon svg {
+            width: 22px;
+            height: 22px;
+        }
+        .resource-card__body {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            flex: 1;
+            min-width: 0;
+        }
+        .resource-card__label {
+            font-size: 15px;
+            font-weight: 650;
+            color: var(--gray800);
+            letter-spacing: -.01em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .resource-card__desc {
+            font-size: 13px;
+            color: var(--gray500);
+            line-height: 1.4;
+        }
+        .resource-card__external {
+            flex-shrink: 0;
+            opacity: .4;
+            transition: var(--transition-fast);
+        }
+        .resource-card:hover .resource-card__external {
+            opacity: .8;
+            color: var(--accent);
+        }
+
+        @media(max-width: 1000px) {
+            .resource-grid { grid-template-columns: 1fr; max-width: 420px; }
+        }
+
         @media(max-width: 640px) {
             .header-inner { padding: 0 16px; }
             .hero { padding: 56px 18px 44px; }
@@ -940,6 +1025,7 @@
             .logo { font-size: 18px; gap: 8px; }
             .logo-img { width: 30px; height: 30px; border-radius: 8px; }
             .header-cta { padding: 8px 16px; font-size: 12px; border-radius: 8px; }
+            .resource-card { padding: 16px 18px; }
         }
     </style>
 </head>
@@ -964,17 +1050,14 @@
     <header class="header" id="header">
         <div class="header-inner">
             <a href="#" class="logo">
-                <img class="logo-img" src="imgs/logo.png" alt="Scider Logo" />
+                <img class="logo-img" src="img/logo.png" alt="Scider Logo" />
                 Scider
             </a>
-            <a href="#" class="header-cta"><span>开始使用</span></a>
+            <a href="http://39.107.252.200/" class="header-cta"><span>开始使用</span></a>
         </div>
     </header>
 
     <section class="hero">
-        <div class="hero-badge reveal">
-            <span class="dot"></span> AI 驱动 · 实时在线
-        </div>
         <h1 class="reveal">
             让学术阅读<br />变得<span class="gradient">高效而深刻</span>
         </h1>
@@ -983,7 +1066,7 @@
             从上传到理解，从归纳到探索，全程陪伴你的科研之路。
         </p>
         <div class="hero-actions reveal">
-            <a href="#" class="btn btn-primary">
+            <a href="http://39.107.252.200/" class="btn btn-primary">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 免费体验
             </a>
@@ -999,9 +1082,9 @@
         <div class="section-inner">
             <div class="section-header reveal">
                 <div class="section-label">核心功能</div>
-                <h2 class="section-title">六大能力，覆盖论文管理全链路</h2>
+                <h2 class="section-title">八大能力，覆盖论文管理全链路</h2>
                 <p class="section-desc">
-                    从 PDF 上传到 AI 问答，Scider 为你的学术研究提供一站式解决方案。
+                    从 PDF 上传、预览批注到 AI 问答，Scider 为你的学术研究提供一站式解决方案。
                 </p>
             </div>
             <div class="features-module">
@@ -1016,21 +1099,8 @@
                         <div class="feature-detail">📚 支持批量导入 · 多级分类 · 全文检索</div>
                     </div>
                     <div class="feature-screenshot">
-                        <div class="screenshot-container">
-                            <div class="mock-ui">
-                                <div class="mock-header"><span></span><span></span><span></span></div>
-                                <div class="mock-preview">
-                                    <div class="mock-card">
-                                        <div class="mock-line short"></div>
-                                        <div class="mock-line medium"></div>
-                                        <div class="mock-line" style="width:45%"></div>
-                                    </div>
-                                    <div class="mock-card" style="margin-top:8px">
-                                        <div class="mock-line short"></div>
-                                        <div class="mock-line medium"></div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="screenshot-container" style="background:transparent;">
+                            <img src="img/library.png" alt="智能文献库" style="width:100%; height:100%; object-fit:contain;" />
                         </div>
                     </div>
                 </div>
@@ -1045,16 +1115,8 @@
                         <div class="feature-detail">✨ 即时生成摘要 · 结构化输出 · 一键复制笔记</div>
                     </div>
                     <div class="feature-screenshot">
-                        <div class="screenshot-container">
-                            <div class="mock-ui">
-                                <div class="mock-header"><span></span><span></span><span></span></div>
-                                <div class="mock-preview">
-                                    <div class="mock-tag">背景</div><div class="mock-tag" style="background:rgba(96,155,153,.15)">方法</div>
-                                    <div class="mock-tag">创新点</div><div class="mock-tag">结论</div>
-                                    <div class="mock-line" style="margin-top:12px"></div>
-                                    <div class="mock-line short"></div>
-                                </div>
-                            </div>
+                        <div class="screenshot-container" style="background:transparent;">
+                            <img src="img/element.png" alt="四要素提取" style="width:100%; height:100%; object-fit:contain;" />
                         </div>
                     </div>
                 </div>
@@ -1069,16 +1131,8 @@
                         <div class="feature-detail">⚡ 高并发处理 · 实时进度跟踪 · 任务队列管理</div>
                     </div>
                     <div class="feature-screenshot">
-                        <div class="screenshot-container">
-                            <div class="mock-ui">
-                                <div class="mock-header"><span></span><span></span><span></span></div>
-                                <div class="mock-preview">
-                                    <div class="mock-line" style="width:40%"></div>
-                                    <div class="mock-line" style="width:70%"></div>
-                                    <div class="mock-line" style="width:55%"></div>
-                                    <div style="display:flex; gap:8px; margin-top:12px"><div style="height:8px; width:100%; background:#609b99; border-radius:4px; opacity:0.6"></div></div>
-                                </div>
-                            </div>
+                        <div class="screenshot-container" style="background:transparent;">
+                            <img src="img/celery.png" alt="异步任务引擎" style="width:100%; height:100%; object-fit:contain;" />
                         </div>
                     </div>
                 </div>
@@ -1093,15 +1147,8 @@
                         <div class="feature-detail">💬 流式响应 · 上下文感知 · 多轮深度追问</div>
                     </div>
                     <div class="feature-screenshot">
-                        <div class="screenshot-container">
-                            <div class="mock-ui">
-                                <div class="mock-header"><span></span><span></span><span></span></div>
-                                <div class="mock-preview">
-                                    <div class="mock-avatar"></div>
-                                    <div class="mock-line" style="width:70%"></div>
-                                    <div class="mock-line" style="width:55%"></div>
-                                </div>
-                            </div>
+                        <div class="screenshot-container" style="background:transparent;">
+                            <img src="img/aichat.gif" alt="AI 对话问答" style="width:100%; height:100%; object-fit:contain;" />
                         </div>
                     </div>
                 </div>
@@ -1116,19 +1163,10 @@
                         <div class="feature-detail">🔍 引文网络 · 相似论文推荐 · 研究趋势分析</div>
                     </div>
                     <div class="feature-screenshot">
-                        <div class="screenshot-container">
-                            <div class="mock-ui">
-                                <div class="mock-header"><span></span><span></span><span></span></div>
-                                <div class="mock-preview">
-                                    <div class="mock-chart">
-                                        <div class="mock-bar" style="height:30px"></div>
-                                        <div class="mock-bar" style="height:48px"></div>
-                                        <div class="mock-bar" style="height:22px"></div>
-                                        <div class="mock-bar" style="height:40px"></div>
-                                    </div>
-                                    <div class="mock-line" style="margin-top:10px"></div>
-                                </div>
-                            </div>
+                        <div class="screenshot-container" style="background:transparent; position:relative;">
+                            <img class="carousel-slide" src="img/search%20-%201.png" alt="论文发现与探索 1" style="width:100%; height:100%; object-fit:contain; position:absolute; inset:0; opacity:1; transition:opacity .6s ease;" />
+                            <img class="carousel-slide" src="img/search%20-%202.png" alt="论文发现与探索 2" style="width:100%; height:100%; object-fit:contain; position:absolute; inset:0; opacity:0; transition:opacity .6s ease;" />
+                            <img class="carousel-slide" src="img/search%20-%203.png" alt="论文发现与探索 3" style="width:100%; height:100%; object-fit:contain; position:absolute; inset:0; opacity:0; transition:opacity .6s ease;" />
                         </div>
                     </div>
                 </div>
@@ -1143,18 +1181,40 @@
                         <div class="feature-detail">🕸️ 关系可视化 · 可拖拽节点 · 动态筛选探索</div>
                     </div>
                     <div class="feature-screenshot">
-                        <div class="screenshot-container">
-                            <div class="mock-ui">
-                                <div class="mock-header"><span></span><span></span><span></span></div>
-                                <div class="mock-preview">
-                                    <div class="mock-tag">关联</div><div class="mock-tag">引用</div><div class="mock-tag">共现</div>
-                                    <div style="display:flex; justify-content:center; margin-top:12px; gap:12px">
-                                        <div style="width:8px; height:8px; background:#609b99; border-radius:50%"></div>
-                                        <div style="width:8px; height:8px; background:#609b99; border-radius:50%"></div>
-                                        <div style="width:8px; height:8px; background:#609b99; border-radius:50%"></div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="screenshot-container" style="background:transparent;">
+                            <img src="img/graph.gif" alt="知识图谱可视化" style="width:100%; height:100%; object-fit:contain;" />
+                        </div>
+                    </div>
+                </div>
+                <!-- PDF 在线预览 -->
+                <div class="feature-block reveal">
+                    <div class="feature-text">
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><rect x="8" y="12" width="8" height="6" rx="1"/><path d="M10 12v-2a2 2 0 0 1 4 0v2"/></svg>
+                        </div>
+                        <h3>PDF 在线预览</h3>
+                        <div class="feature-desc">无需下载，直接在平台内预览 PDF 全文。支持页码跳转、缩放自如、全文搜索，沉浸式阅读体验如同纸质论文。</div>
+                        <div class="feature-detail">📖 页码导航 · 无极缩放 · 全文搜索定位</div>
+                    </div>
+                    <div class="feature-screenshot">
+                        <div class="screenshot-container" style="background:transparent;">
+                            <img src="img/pdf.png" alt="PDF 在线预览" style="width:100%; height:100%; object-fit:contain;" />
+                        </div>
+                    </div>
+                </div>
+                <!-- 论文笔记与批注 -->
+                <div class="feature-block reveal">
+                    <div class="feature-text">
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                        </div>
+                        <h3>论文笔记与批注</h3>
+                        <div class="feature-desc">随时在论文旁记录想法、高亮标记重点段落。笔记支持分类整理与全文搜索，让零散思路转化为系统知识库。</div>
+                        <div class="feature-detail">✏️ 高亮标注 · Markdown 笔记 · 一键导出</div>
+                    </div>
+                    <div class="feature-screenshot">
+                        <div class="screenshot-container" style="background:transparent;">
+                            <img src="img/note.png" alt="论文笔记与批注" style="width:100%; height:100%; object-fit:contain;" />
                         </div>
                     </div>
                 </div>
@@ -1207,7 +1267,7 @@
             </div>
             <div class="stats-row reveal">
                 <div class="stat-item">
-                    <div class="stat-number">6+</div>
+                    <div class="stat-number">8+</div>
                     <div class="stat-label">核心功能模块</div>
                 </div>
                 <div class="stat-item">
@@ -1226,21 +1286,43 @@
         </div>
     </section>
 
-    <section class="cta-section">
-        <div class="cta-card reveal">
-            <h2>准备好提升你的<br />论文阅读效率了吗？</h2>
-            <p>
-                加入 Scider，让 AI 帮你从海量论文中解放出来，专注于真正重要的——理解与创新。
-            </p>
-            <a href="#" class="btn btn-primary">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                立即免费体验
-            </a>
+    <!-- 更多资源 -->
+    <section class="section">
+        <div class="section-inner">
+            <div class="section-header reveal">
+                <div class="section-label">更多资源</div>
+                <h2 class="section-title">了解更多</h2>
+                <p class="section-desc">
+                    查看项目博客与源代码，持续关注 Scider 的最新动态。
+                </p>
+            </div>
+            <div class="resource-grid reveal-stagger">
+                <a href="https://www.cnblogs.com/BBnomoney" target="_blank" rel="noopener noreferrer" class="resource-card">
+                    <span class="resource-card__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    </span>
+                    <div class="resource-card__body">
+                        <span class="resource-card__label">团队博客</span>
+                        <span class="resource-card__desc">了解项目开发历程与团队动态</span>
+                    </div>
+                    <svg class="resource-card__external" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+                <a href="https://github.com/XiaCang/Scider" target="_blank" rel="noopener noreferrer" class="resource-card">
+                    <span class="resource-card__icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    </span>
+                    <div class="resource-card__body">
+                        <span class="resource-card__label">开源代码仓库</span>
+                        <span class="resource-card__desc">GitHub 源码、Issue 与 Release</span>
+                    </div>
+                    <svg class="resource-card__external" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+            </div>
         </div>
     </section>
 
     <footer class="footer">
-        <p>&copy; 2025 Scider. 让学术阅读变得高效而深刻。</p>
+        <p>&copy; Scider 北航2026年春季软件工程</p>
     </footer>
 
     <script>
@@ -1269,6 +1351,19 @@
                 }
             }, { passive: true }
         );
+
+        /* ===== Carousel (论文发现与探索) ===== */
+        (function () {
+            const slides = document.querySelectorAll('.carousel-slide');
+            if (!slides.length) return;
+            let current = 0;
+            const total = slides.length;
+            setInterval(() => {
+                slides[current].style.opacity = '0';
+                current = (current + 1) % total;
+                slides[current].style.opacity = '1';
+            }, 3000);
+        })();
     </script>
 </body>
 </html>
