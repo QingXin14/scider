@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scider — 智能学术论文辅助平台</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+    <style>
+        /* ===== RESET ===== */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fafbfc;
+            color: #1a1a2e;
+            line-height: 1.7;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ===== CSS VARIABLES ===== */
+        :root {
+            --accent: #609b99;
+            --accent2: #528b89;
+            --accent3: #609b99;
+            --accent4: #609b99;
+            --accent5: #609b99;
+            --gray50: #f8fafc;
+            --gray75: #f4f6f9;
+            --gray100: #f1f5f9;
+            --gray150: #e9eef3;
+            --gray200: #e2e8f0;
+            --gray300: #cbd5e1;
+            --gray400: #94a3b8;
+            --gray500: #64748b;
+            --gray600: #475569;
+            --gray700: #334155;
+            --gray800: #1e293b;
+            --gray900: #0f172a;
+            --radius-sm: 10px;
+            --radius: 16px;
+            --radius-lg: 22px;
+            --radius-xl: 28px;
+            --shadow-xs: 0 1px 2px rgba(0, 0, 0, .03);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, .04), 0 1px 8px rgba(0, 0, 0, .02);
+            --shadow: 0 4px 20px rgba(0, 0, 0, .04), 0 1px 10px rgba(0, 0, 0, .02);
+            --shadow-md: 0 8px 30px rgba(0, 0, 0, .05), 0 2px 14px rgba(0, 0, 0, .03);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, .06), 0 4px 20px rgba(0, 0, 0, .03);
+            --shadow-xl: 0 24px 64px rgba(0, 0, 0, .07), 0 8px 30px rgba(0, 0, 0, .04);
+            --shadow-glow-blue: 0 0 0 1px rgba(96, 155, 153, .08), 0 8px 32px rgba(96, 155, 153, .1);
+            --shadow-glow-purple: 0 0 0 1px rgba(96, 155, 153, .08), 0 8px 32px rgba(96, 155, 153, .1);
+            --transition-fast: all .2s cubic-bezier(.4, 0, .2, 1);
+            --transition: all .4s cubic-bezier(.22, .61, .36, 1);
+            --transition-slow: all .6s cubic-bezier(.16, 1, .3, 1);
+            --transition-bounce: all .5s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        /* ===== BACKGROUND DECOR ===== */
+        .bg-decor {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-decor .grid-layer {
+            position: absolute;
+            inset: -40px;
+            background-image:
+                linear-gradient(rgba(148, 163, 184, .05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, .05) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(ellipse 65% 65% at 50% 45%, #000 25%, transparent 100%);
+            -webkit-mask-image: radial-gradient(ellipse 65% 65% at 50% 45%, #000 25%, transparent 100%);
+            animation: grid-drift 20s linear infinite;
+        }
+        @keyframes grid-drift {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(2px, -1px); }
+            50% { transform: translate(0, -2px); }
+            75% { transform: translate(-2px, -1px); }
+            100% { transform: translate(0, 0); }
+        }
+        .bg-decor .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: .07;
+            pointer-events: none;
+        }
+        .bg-decor .orb--center {
+            width: 560px;
+            height: 560px;
+            background: var(--accent);
+            top: 48%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: orb-breathe-center 10s ease-in-out infinite;
+        }
+        .bg-decor .orb--top {
+            width: 380px;
+            height: 380px;
+            background: var(--accent2);
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: orb-breathe-x 12s ease-in-out 3s infinite;
+        }
+        .bg-decor .orb--bottom {
+            width: 340px;
+            height: 340px;
+            background: var(--accent3);
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: orb-breathe-x 11s ease-in-out 6s infinite;
+        }
+        .bg-decor .orb--accent {
+            width: 200px;
+            height: 200px;
+            background: var(--accent5);
+            top: 70%;
+            left: 15%;
+            opacity: .04;
+            animation: orb-float 14s ease-in-out 1s infinite;
+        }
+        @keyframes orb-breathe-center {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: .06; }
+            33% { transform: translate(-50%, -50%) scale(1.12); opacity: .09; }
+            66% { transform: translate(-50%, -50%) scale(1.05); opacity: .07; }
+        }
+        @keyframes orb-breathe-x {
+            0%, 100% { transform: translateX(-50%) scale(1); opacity: .06; }
+            50% { transform: translateX(-50%) scale(1.18); opacity: .1; }
+        }
+        @keyframes orb-float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -20px) scale(1.2); }
+            50% { transform: translate(-10px, -40px) scale(.9); }
+            75% { transform: translate(-30px, -10px) scale(1.15); }
+        }
+        .bg-decor .particles {
+            position: absolute;
+            inset: 0;
+        }
+        .bg-decor .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: 0;
+            animation: particle-float 8s ease-in-out infinite;
+        }
+        .bg-decor .particle:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; background: var(--accent3); }
+        .bg-decor .particle:nth-child(2) { top: 30%; left: 85%; animation-delay: 2s; background: var(--accent2); }
+        .bg-decor .particle:nth-child(3) { top: 65%; left: 20%; animation-delay: 4s; background: var(--accent4); }
+        .bg-decor .particle:nth-child(4) { top: 75%; left: 78%; animation-delay: 6s; background: var(--accent5); }
+        .bg-decor .particle:nth-child(5) { top: 15%; left: 45%; animation-delay: 1s; background: var(--accent); }
+        .bg-decor .particle:nth-child(6) { top: 55%; left: 60%; animation-delay: 3.5s; background: var(--accent3); }
+        @keyframes particle-float {
+            0%, 100% { opacity: 0; transform: translate(0, 0) scale(1); }
+            20% { opacity: .5; transform: translate(8px, -18px) scale(1.6); }
+            40% { opacity: .25; transform: translate(-4px, -30px) scale(1); }
+            60% { opacity: .55; transform: translate(-10px, -14px) scale(1.8); }
+            80% { opacity: .15; transform: translate(4px, -24px) scale(.8); }
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, .78);
+            backdrop-filter: blur(20px) saturate(1.5);
+            -webkit-backdrop-filter: blur(20px) saturate(1.5);
+            border-bottom: 1px solid transparent;
+            transition: var(--transition);
+        }
+        .header.scrolled {
+            border-bottom-color: rgba(148, 163, 184, .15);
+            box-shadow: 0 1px 20px rgba(0, 0, 0, .03);
+            background: rgba(255, 255, 255, .88);
+        }
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 40px;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-weight: 800;
+            font-size: 21px;
+            color: var(--gray900);
+            text-decoration: none;
+            letter-spacing: -.01em;
+            transition: var(--transition-fast);
+        }
+        .logo-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            object-fit: contain;
+            transition: var(--transition-bounce);
+            box-shadow: 0 4px 14px rgba(96, 155, 153, .12);
+        }
+        .logo:hover .logo-img {
+            transform: scale(1.08);
+            box-shadow: 0 6px 22px rgba(96, 155, 153, .22);
+        }
+        .logo:hover {
+            color: var(--accent);
+        }
+        .header-cta {
+            padding: 10px 24px;
+            background: var(--gray900);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+            letter-spacing: .01em;
+            position: relative;
+            overflow: hidden;
+        }
+        .header-cta::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            opacity: 0;
+            transition: opacity .35s ease;
+            border-radius: 10px;
+        }
+        .header-cta:hover::before {
+            opacity: 1;
+        }
+        .header-cta>* {
+            position: relative;
+            z-index: 1;
+        }
+        .header-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(96, 155, 153, .28);
+        }
+        .header-cta:active {
+            transform: translateY(0);
+            transition: all .1s ease;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            padding: 100px 40px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(96, 155, 153, .025) 0%, transparent 68%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            border-radius: 50%;
+            animation: hero-glow 8s ease-in-out infinite;
+        }
+        @keyframes hero-glow {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: .7; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 18px;
+            background: #fff;
+            border: 1px solid var(--gray200);
+            border-radius: 99px;
+            font-size: 13px;
+            color: var(--gray600);
+            margin-bottom: 36px;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+            box-shadow: var(--shadow-xs);
+            transition: var(--transition);
+            cursor: default;
+        }
+        .hero-badge:hover {
+            border-color: var(--accent3);
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-1px);
+        }
+        .hero-badge .dot {
+            width: 7px;
+            height: 7px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse-dot 2.2s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(34, 197, 94, .5);
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px rgba(34, 197, 94, .4); }
+            50% { opacity: .4; transform: scale(1.5); box-shadow: 0 0 18px rgba(34, 197, 94, .7); }
+        }
+        .hero h1 {
+            font-size: clamp(44px, 7vw, 76px);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -.03em;
+            margin-bottom: 26px;
+            color: var(--gray900);
+            position: relative;
+            z-index: 1;
+        }
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 45%, var(--accent3) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 220% 220%;
+            animation: gradient-shift 7s ease infinite;
+        }
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 100% 0%; }
+            50% { background-position: 100% 100%; }
+            75% { background-position: 0% 100%; }
+        }
+        .hero p {
+            font-size: 18px;
+            color: var(--gray500);
+            max-width: 600px;
+            margin: 0 auto 48px;
+            line-height: 1.75;
+            position: relative;
+            z-index: 1;
+            letter-spacing: .005em;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 15px 36px;
+            border-radius: 13px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: .005em;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(96, 155, 153, .2), 0 1px 4px rgba(96, 155, 153, .15);
+        }
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--accent3), var(--accent2));
+            opacity: 0;
+            transition: opacity .4s ease;
+            border-radius: 13px;
+        }
+        .btn-primary:hover::after {
+            opacity: 1;
+        }
+        .btn-primary>* {
+            position: relative;
+            z-index: 1;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 36px rgba(96, 155, 153, .3), 0 2px 8px rgba(96, 155, 153, .2);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+            transition: all .1s ease;
+            box-shadow: 0 4px 14px rgba(96, 155, 153, .2);
+        }
+        .btn-outline {
+            background: #fff;
+            color: var(--gray800);
+            border: 1.5px solid var(--gray300);
+            box-shadow: var(--shadow-xs);
+        }
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md), 0 0 0 4px rgba(96, 155, 153, .04);
+        }
+        .btn-outline:active {
+            transform: translateY(0);
+            transition: all .1s ease;
+        }
+        .btn svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        /* ===== SECTION ===== */
+        .section {
+            padding: 100px 40px;
+            position: relative;
+        }
+        .section-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section-label {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            color: var(--accent);
+            margin-bottom: 14px;
+            display: inline-block;
+            padding: 5px 14px;
+            background: rgba(96, 155, 153, .04);
+            border-radius: 6px;
+        }
+        .section-title {
+            font-size: clamp(30px, 4.5vw, 48px);
+            font-weight: 800;
+            letter-spacing: -.02em;
+            margin-bottom: 18px;
+            color: var(--gray900);
+            line-height: 1.2;
+        }
+        .section-desc {
+            font-size: 17px;
+            color: var(--gray500);
+            max-width: 540px;
+            line-height: 1.7;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 72px;
+        }
+        .section-header .section-desc {
+            margin: 0 auto;
+        }
+
+        /* ===== FEATURES — 分模块功能展示 ===== */
+        .features-module {
+            display: flex;
+            flex-direction: column;
+            gap: 80px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .feature-block {
+            display: flex;
+            align-items: center;
+            gap: 56px;
+            background: #fff;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray150);
+            padding: 36px 40px 36px 48px;
+            transition: var(--transition);
+            box-shadow: var(--shadow-xs);
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-block:nth-child(even) {
+            flex-direction: row-reverse;
+            padding: 36px 48px 36px 40px;
+        }
+        .feature-block:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-xl);
+            border-color: rgba(96, 155, 153, .2);
+        }
+        .feature-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(120deg, rgba(96, 155, 153, .02), rgba(96, 155, 153, .06));
+            transition: width .6s cubic-bezier(.16, 1, .3, 1);
+            z-index: 0;
+        }
+        .feature-block:hover::before {
+            width: 100%;
+        }
+        .feature-text {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+            background: rgba(96, 155, 153, .08);
+            color: var(--accent);
+            transition: var(--transition-bounce);
+        }
+        .feature-block:hover .feature-icon {
+            transform: scale(1.08);
+            background: rgba(96, 155, 153, .15);
+        }
+        .feature-text h3 {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: var(--gray900);
+            letter-spacing: -.01em;
+        }
+        .feature-text .feature-desc {
+            font-size: 16px;
+            color: var(--gray500);
+            line-height: 1.65;
+            margin-bottom: 18px;
+        }
+        .feature-detail {
+            font-size: 14px;
+            color: var(--accent);
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+            transition: var(--transition-fast);
+            cursor: default;
+        }
+        .feature-detail svg {
+            width: 16px;
+            height: 16px;
+            transition: var(--transition-fast);
+        }
+        .feature-block:hover .feature-detail svg {
+            transform: translateX(4px);
+        }
+        .feature-screenshot {
+            flex: 1.1;
+            aspect-ratio: 16 / 10;
+            border-radius: var(--radius);
+            background: #f8fafc;
+            border: 1px solid var(--gray200);
+            overflow: hidden;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        .feature-block:hover .feature-screenshot {
+            box-shadow: var(--shadow-md);
+            border-color: rgba(96, 155, 153, .2);
+        }
+        .screenshot-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #ffffff 0%, #f3f6fc 100%);
+            position: relative;
+        }
+        .mock-ui {
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+        }
+        .mock-ui .mock-header {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        .mock-ui .mock-header span {
+            width: 32px;
+            height: 6px;
+            background: var(--gray300);
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+        .feature-block:hover .mock-ui .mock-header span {
+            background: var(--accent);
+        }
+        .mock-ui .mock-preview {
+            background: #eef2f6;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 8px;
+        }
+        .mock-ui .mock-card {
+            background: white;
+            border-radius: 10px;
+            padding: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid var(--gray200);
+        }
+        .mock-ui .mock-line {
+            height: 8px;
+            background: var(--gray200);
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+        .mock-ui .mock-line.short {
+            width: 60%;
+        }
+        .mock-ui .mock-line.medium {
+            width: 80%;
+        }
+        .mock-ui .mock-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+        .mock-ui .mock-bar {
+            width: 28px;
+            background: var(--accent);
+            border-radius: 6px 6px 0 0;
+            opacity: 0.5;
+        }
+        .feature-block:hover .mock-ui .mock-bar {
+            opacity: 0.8;
+        }
+        .mock-ui .mock-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--gray200);
+            border-radius: 50%;
+            margin: 0 auto 12px;
+        }
+        .mock-ui .mock-tag {
+            display: inline-block;
+            background: rgba(96, 155, 153, .1);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            color: var(--accent);
+            margin: 6px 4px 0 0;
+        }
+
+        @media(max-width: 900px) {
+            .feature-block,
+            .feature-block:nth-child(even) {
+                flex-direction: column;
+                padding: 32px;
+                gap: 32px;
+            }
+            .feature-text h3 {
+                font-size: 22px;
+            }
+            .feature-screenshot {
+                width: 100%;
+            }
+        }
+
+        /* ===== 技术栈 ===== */
+        .stack-categories {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+            max-width: 780px;
+            margin: 0 auto;
+        }
+        .stack-category {
+            background: #fff;
+            border: 1px solid var(--gray150);
+            border-radius: var(--radius);
+            padding: 30px 28px;
+            transition: var(--transition);
+            box-shadow: var(--shadow-xs);
+            position: relative;
+            overflow: hidden;
+        }
+        .stack-category::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity .4s ease;
+            border-radius: 0 0 2px 2px;
+        }
+        .stack-category:hover {
+            border-color: rgba(96, 155, 153, .18);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+        .stack-category:hover::before {
+            opacity: 1;
+        }
+        .stack-category h4 {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: .04em;
+            color: var(--accent);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stack-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .stack-tag {
+            padding: 7px 16px;
+            background: var(--gray75);
+            border: 1px solid var(--gray150);
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray700);
+            transition: var(--transition-fast);
+            cursor: default;
+            letter-spacing: .01em;
+        }
+        .stack-tag:hover {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(96, 155, 153, .2);
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            margin: 60px 0 0;
+        }
+        .stat-item {
+            text-align: center;
+            min-width: 110px;
+            transition: var(--transition);
+            cursor: default;
+        }
+        .stat-item:hover {
+            transform: translateY(-4px);
+        }
+        .stat-number {
+            font-size: 50px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            letter-spacing: -.02em;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray500);
+            margin-top: 6px;
+            font-weight: 500;
+            letter-spacing: .02em;
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 110px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(96, 155, 153, .03) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            border-radius: 50%;
+        }
+        .cta-card {
+            max-width: 620px;
+            margin: 0 auto;
+            padding: 64px 52px;
+            border-radius: var(--radius-xl);
+            background: #fff;
+            border: 1px solid var(--gray150);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+        }
+        .cta-card:hover {
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(96, 155, 153, .05);
+            transform: translateY(-2px);
+        }
+        .cta-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 40% at 50% -5%, rgba(96, 155, 153, .04) 0%, transparent 55%),
+                radial-gradient(ellipse 55% 40% at 50% 105%, rgba(96, 155, 153, .03) 0%, transparent 55%);
+            border-radius: var(--radius-xl);
+            pointer-events: none;
+        }
+        .cta-card>* {
+            position: relative;
+            z-index: 1;
+        }
+        .cta-card h2 {
+            font-size: 34px;
+            font-weight: 800;
+            margin-bottom: 18px;
+            letter-spacing: -.02em;
+            line-height: 1.25;
+            color: var(--gray900);
+        }
+        .cta-card p {
+            font-size: 17px;
+            color: var(--gray500);
+            margin-bottom: 38px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+        }
+        .cta-card .btn-primary {
+            padding: 17px 46px;
+            font-size: 17px;
+            border-radius: 14px;
+        }
+
+        .footer {
+            border-top: 1px solid var(--gray150);
+            padding: 34px 40px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--gray400);
+            letter-spacing: .03em;
+            background: #fff;
+        }
+        .footer p {
+            transition: var(--transition-fast);
+        }
+        .footer:hover p {
+            color: var(--gray500);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all .85s cubic-bezier(.16, 1, .3, 1);
+            will-change: transform, opacity;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-stagger>* {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all .7s cubic-bezier(.16, 1, .3, 1);
+        }
+        .reveal-stagger.visible>*:nth-child(1) { transition-delay: 0s; opacity: 1; transform: translateY(0); }
+        .reveal-stagger.visible>*:nth-child(2) { transition-delay: .08s; opacity: 1; transform: translateY(0); }
+        .reveal-stagger.visible>*:nth-child(3) { transition-delay: .16s; opacity: 1; transform: translateY(0); }
+        .reveal-stagger.visible>*:nth-child(4) { transition-delay: .24s; opacity: 1; transform: translateY(0); }
+        .reveal-stagger.visible>*:nth-child(5) { transition-delay: .32s; opacity: 1; transform: translateY(0); }
+        .reveal-stagger.visible>*:nth-child(6) { transition-delay: .40s; opacity: 1; transform: translateY(0); }
+
+        @media(max-width: 1000px) {
+            .stack-categories { grid-template-columns: 1fr; max-width: 420px; }
+            .stats-row { gap: 40px; }
+            .hero { padding: 70px 28px 56px; }
+            .hero h1 { font-size: clamp(34px, 6vw, 50px); }
+            .section { padding: 70px 28px; }
+            .cta-card { padding: 48px 32px; }
+            .cta-section { padding: 80px 28px; }
+            .header-inner { padding: 0 24px; }
+        }
+        @media(max-width: 640px) {
+            .header-inner { padding: 0 16px; }
+            .hero { padding: 56px 18px 44px; }
+            .hero h1 { font-size: 30px; }
+            .hero p { font-size: 15px; }
+            .section-title { font-size: 26px; }
+            .cta-card h2 { font-size: 24px; }
+            .cta-card { padding: 36px 20px; }
+            .stats-row { gap: 24px; }
+            .stat-number { font-size: 38px; }
+            .btn { padding: 13px 26px; font-size: 14px; border-radius: 10px; }
+            .section { padding: 50px 18px; }
+            .cta-section { padding: 60px 18px; }
+            .logo { font-size: 18px; gap: 8px; }
+            .logo-img { width: 30px; height: 30px; border-radius: 8px; }
+            .header-cta { padding: 8px 16px; font-size: 12px; border-radius: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-decor">
+        <div class="grid-layer"></div>
+        <div class="orb orb--center"></div>
+        <div class="orb orb--top"></div>
+        <div class="orb orb--bottom"></div>
+        <div class="orb orb--accent"></div>
+        <div class="particles">
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+        </div>
+    </div>
+
+    <header class="header" id="header">
+        <div class="header-inner">
+            <a href="#" class="logo">
+                <img class="logo-img" src="imgs/logo.png" alt="Scider Logo" />
+                Scider
+            </a>
+            <a href="#" class="header-cta"><span>开始使用</span></a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-badge reveal">
+            <span class="dot"></span> AI 驱动 · 实时在线
+        </div>
+        <h1 class="reveal">
+            让学术阅读<br />变得<span class="gradient">高效而深刻</span>
+        </h1>
+        <p class="reveal">
+            Scider 论文智能管理平台<br />
+            从上传到理解，从归纳到探索，全程陪伴你的科研之路。
+        </p>
+        <div class="hero-actions reveal">
+            <a href="#" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                免费体验
+            </a>
+            <a href="#" class="btn btn-outline">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                观看演示
+            </a>
+        </div>
+    </section>
+
+    <!-- 核心功能：分模块展示 + 截图 -->
+    <section class="section">
+        <div class="section-inner">
+            <div class="section-header reveal">
+                <div class="section-label">核心功能</div>
+                <h2 class="section-title">六大能力，覆盖论文管理全链路</h2>
+                <p class="section-desc">
+                    从 PDF 上传到 AI 问答，Scider 为你的学术研究提供一站式解决方案。
+                </p>
+            </div>
+            <div class="features-module">
+                <!-- 智能文献库 -->
+                <div class="feature-block reveal">
+                    <div class="feature-text">
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <h3>智能文献库</h3>
+                        <div class="feature-desc">上传 PDF 论文自动解析，文件夹分类管理，MD5 去重保障。自定义文件夹层级结构，让你的论文收藏井然有序。</div>
+                        <div class="feature-detail">📚 支持批量导入 · 多级分类 · 全文检索</div>
+                    </div>
+                    <div class="feature-screenshot">
+                        <div class="screenshot-container">
+                            <div class="mock-ui">
+                                <div class="mock-header"><span></span><span></span><span></span></div>
+                                <div class="mock-preview">
+                                    <div class="mock-card">
+                                        <div class="mock-line short"></div>
+                                        <div class="mock-line medium"></div>
+                                        <div class="mock-line" style="width:45%"></div>
+                                    </div>
+                                    <div class="mock-card" style="margin-top:8px">
+                                        <div class="mock-line short"></div>
+                                        <div class="mock-line medium"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 四要素提取 -->
+                <div class="feature-block reveal">
+                    <div class="feature-text">
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+                        </div>
+                        <h3>四要素提取</h3>
+                        <div class="feature-desc">大模型自动提取论文核心四要素——背景、方法、创新点、结论，帮你快速建立论文认知框架，阅读效率提升 10 倍。</div>
+                        <div class="feature-detail">✨ 即时生成摘要 · 结构化输出 · 一键复制笔记</div>
+                    </div>
+                    <div class="feature-screenshot">
+                        <div class="screenshot-container">
+                            <div class="mock-ui">
+                                <div class="mock-header"><span></span><span></span><span></span></div>
+                                <div class="mock-preview">
+                                    <div class="mock-tag">背景</div><div class="mock-tag" style="background:rgba(96,155,153,.15)">方法</div>
+                                    <div class="mock-tag">创新点</div><div class="mock-tag">结论</div>
+                                    <div class="mock-line" style="margin-top:12px"></div>
+                                    <div class="mock-line short"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 异步任务引擎 -->
+                <div class="feature-block reveal">
+                    <div class="feature-text">
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        </div>
+                        <h3>异步任务引擎</h3>
+                        <div class="feature-desc">基于 Celery + Redis 的后台任务系统，论文上传后自动触发 PDF 解析 → LLM 提取任务链，无需等待。</div>
+                        <div class="feature-detail">⚡ 高并发处理 · 实时进度跟踪 · 任务队列管理</div>
+                    </div>
+                    <div class="feature-screenshot">
+                        <div class="screenshot-container">
+                            <div class="mock-ui">
+                                <div class="mock-header"><span></span><span></span><span></span></div>
+                                <div class="mock-preview">
+                                    <div class="mock-line" style="width:40%"></div>
+                                    <div class="mock-line" style="width:70%"></div>
+                                    <div class="mock-line" style="width:55%"></div>
+                                    <div style="display:flex; gap:8px; margin-top:12px"><div style="height:8px; width:100%; background:#609b99; border-radius:4px; opacity:0.6"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- AI 对话问答 -->
+                <div class="feature-block reveal">
+                    <div class="feature-text">
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <h3>AI 对话问答</h3>
+                        <div class="feature-desc">WebSocket 流式对话，基于论文全文的上下文问答。支持多轮对话、历史管理，事实提取 / 总结归纳 / 批判分析一应俱全。</div>
+                        <div class="feature-detail">💬 流式响应 · 上下文感知 · 多轮深度追问</div>
+                    </div>
+                    <div class="feature-screenshot">
+                        <div class="screenshot-container">
+                            <div class="mock-ui">
+                                <div class="mock-header"><span></span><span></span><span></span></div>
+                                <div class="mock-preview">
+                                    <div class="mock-avatar"></div>
+                                    <div class="mock-line" style="width:70%"></div>
+                                    <div class="mock-line" style="width:55%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 论文发现与探索 -->
+                <div class="feature-block reveal">
+                    <div class="feature-text">
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </div>
+                        <h3>论文发现与探索</h3>
+                        <div class="feature-desc">可视化浏览论文间的上下游引用关系，挖掘领域内的知识脉络，帮助你找到更多高价值的相关文献。</div>
+                        <div class="feature-detail">🔍 引文网络 · 相似论文推荐 · 研究趋势分析</div>
+                    </div>
+                    <div class="feature-screenshot">
+                        <div class="screenshot-container">
+                            <div class="mock-ui">
+                                <div class="mock-header"><span></span><span></span><span></span></div>
+                                <div class="mock-preview">
+                                    <div class="mock-chart">
+                                        <div class="mock-bar" style="height:30px"></div>
+                                        <div class="mock-bar" style="height:48px"></div>
+                                        <div class="mock-bar" style="height:22px"></div>
+                                        <div class="mock-bar" style="height:40px"></div>
+                                    </div>
+                                    <div class="mock-line" style="margin-top:10px"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 知识图谱可视化 -->
+                <div class="feature-block reveal">
+                    <div class="feature-text">
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                        </div>
+                        <h3>知识图谱可视化</h3>
+                        <div class="feature-desc">以交互式图谱展示论文间的关联，支持拖拽编辑，直观把握领域知识结构。</div>
+                        <div class="feature-detail">🕸️ 关系可视化 · 可拖拽节点 · 动态筛选探索</div>
+                    </div>
+                    <div class="feature-screenshot">
+                        <div class="screenshot-container">
+                            <div class="mock-ui">
+                                <div class="mock-header"><span></span><span></span><span></span></div>
+                                <div class="mock-preview">
+                                    <div class="mock-tag">关联</div><div class="mock-tag">引用</div><div class="mock-tag">共现</div>
+                                    <div style="display:flex; justify-content:center; margin-top:12px; gap:12px">
+                                        <div style="width:8px; height:8px; background:#609b99; border-radius:50%"></div>
+                                        <div style="width:8px; height:8px; background:#609b99; border-radius:50%"></div>
+                                        <div style="width:8px; height:8px; background:#609b99; border-radius:50%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 技术栈部分 -->
+    <section class="section">
+        <div class="section-inner">
+            <div class="section-header reveal">
+                <div class="section-label">技术架构</div>
+                <h2 class="section-title">现代技术栈，稳定可扩展</h2>
+                <p class="section-desc">
+                    前后端分离架构，异步任务驱动，为高效科研而生。
+                </p>
+            </div>
+            <div class="stack-categories reveal-stagger">
+                <div class="stack-category">
+                    <h4>🎨 前端</h4>
+                    <div class="stack-tags">
+                        <span class="stack-tag">Vue 3</span><span class="stack-tag">TypeScript</span>
+                        <span class="stack-tag">Element Plus</span><span class="stack-tag">Pinia</span>
+                        <span class="stack-tag">Vue Router</span><span class="stack-tag">Vite</span>
+                        <span class="stack-tag">WebSocket</span>
+                    </div>
+                </div>
+                <div class="stack-category">
+                    <h4>⚙️ 后端</h4>
+                    <div class="stack-tags">
+                        <span class="stack-tag">FastAPI</span><span class="stack-tag">Python 3</span>
+                        <span class="stack-tag">SQLAlchemy</span><span class="stack-tag">Alembic</span>
+                        <span class="stack-tag">JWT 认证</span>
+                    </div>
+                </div>
+                <div class="stack-category">
+                    <h4>🔄 异步与存储</h4>
+                    <div class="stack-tags">
+                        <span class="stack-tag">Celery</span><span class="stack-tag">Redis</span>
+                        <span class="stack-tag">MySQL</span><span class="stack-tag">Docker</span>
+                    </div>
+                </div>
+                <div class="stack-category">
+                    <h4>🤖 AI 能力</h4>
+                    <div class="stack-tags">
+                        <span class="stack-tag">LLM 集成</span><span class="stack-tag">PyMuPDF</span>
+                        <span class="stack-tag">文本解析</span><span class="stack-tag">流式问答</span>
+                    </div>
+                </div>
+            </div>
+            <div class="stats-row reveal">
+                <div class="stat-item">
+                    <div class="stat-number">6+</div>
+                    <div class="stat-label">核心功能模块</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">AI 问答维度</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">异步任务处理</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">TS</div>
+                    <div class="stat-label">全前端类型安全</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="cta-card reveal">
+            <h2>准备好提升你的<br />论文阅读效率了吗？</h2>
+            <p>
+                加入 Scider，让 AI 帮你从海量论文中解放出来，专注于真正重要的——理解与创新。
+            </p>
+            <a href="#" class="btn btn-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                立即免费体验
+            </a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2025 Scider. 让学术阅读变得高效而深刻。</p>
+    </footer>
+
+    <script>
+        /* ===== Scroll reveal ===== */
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' }
+        );
+
+        document.querySelectorAll('.reveal, .reveal-stagger').forEach((el) => observer.observe(el));
+
+        /* ===== Header scroll effect ===== */
+        const headerEl = document.getElementById('header');
+        window.addEventListener(
+            'scroll',
+            () => {
+                if (window.scrollY > 10) {
+                    headerEl.classList.add('scrolled');
+                } else {
+                    headerEl.classList.remove('scrolled');
+                }
+            }, { passive: true }
+        );
+    </script>
+</body>
+</html>
